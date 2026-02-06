@@ -2,18 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.rotas import router
 import uvicorn
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
 import os
 
 app = FastAPI()
 
-# 1. Configura a pasta de assets (CSS, JS do React)
-# Certifique-se que o caminho ../frontend/dist/assets existe
-app.mount("/assets", StaticFiles(directory="../frontend/dist/assets"), name="assets")
-
 # Configuração de CORS
-origins = ["*"] # Liberado para funcionar no ngrok e localhost
+# Isso permite que o seu site na Vercel converse com esse Backend
+origins = ["*"] 
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,13 +18,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Inclui as rotas da IA
 app.include_router(router)
 
-@app.get("/", response_class=HTMLResponse)
-async def read_root():
-    caminho_index = os.path.join("..", "frontend", "dist", "index.html")
-    with open(caminho_index, "r", encoding="utf-8") as f:
-        return f.read()
+# Rota simples só para testar se está no ar
+@app.get("/")
+def read_root():
+    return {"status": "A Vó está online e pronta para cozinhar! 👵✨"}
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    # Pega a porta que o Render mandar ou usa a 8000
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
