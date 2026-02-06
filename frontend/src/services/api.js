@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/' 
+  baseURL: 'https://receitas-de-vo.onrender.com' 
 });
 
 export default api;
